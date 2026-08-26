@@ -124,33 +124,37 @@ if page == "Dashboard":
     )
 
 # -----------------------------
-# Sales Analysis Page
-# -----------------------------
 elif page == "Sales Analysis":
     st.title("Sales Analysis")
 
     # -----------------------------
-    # Year Filter
+    # Filters
     # -----------------------------
     selected_year = st.selectbox(
         "Select Year",
         sorted(df["Year"].unique())
     )
-    # Category Filter
+
     selected_categories = st.multiselect(
-    "Select Category",
-    options=sorted(df["Category"].unique()),
-    default=sorted(df["Category"].unique())
-)
+        "Select Category",
+        options=sorted(df["Category"].unique()),
+        default=sorted(df["Category"].unique())
+    )
 
-
-    
     selected_regions = st.multiselect(
-    "Select Region",
-    options=sorted(df["Region"].unique()),
-    default=sorted(df["Region"].unique())
-)
-    
+        "Select Region",
+        options=sorted(df["Region"].unique()),
+        default=sorted(df["Region"].unique())
+    )
+
+    # -----------------------------
+    # Create filtered dataset
+    # -----------------------------
+    filtered_df = df[
+        (df["Year"] == selected_year) &
+        (df["Category"].isin(selected_categories)) &
+        (df["Region"].isin(selected_regions))
+    ]
 
     # -----------------------------
     # Sales by Region
@@ -161,10 +165,7 @@ elif page == "Sales Analysis":
         filtered_df.groupby("Region")["Sales"]
         .sum()
         .reset_index()
-        .sort_values(
-            by="Sales",
-            ascending=False
-        )
+        .sort_values(by="Sales", ascending=False)
     )
 
     st.dataframe(sales_by_region)
@@ -176,11 +177,7 @@ elif page == "Sales Analysis":
         title=f"Total Sales by Region - {selected_year}"
     )
 
-    st.plotly_chart(
-        fig_region,
-        use_container_width=True
-    )
-
+    st.plotly_chart(fig_region, use_container_width=True)
     # -----------------------------
     # Sales by Category
     # -----------------------------
